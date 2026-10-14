@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 TELEGRAM_TOKEN = "8848083729:AAGfR_NIAmIThDlK5YEggd2ELg66Edtz0Uk"
 GROQ_API_KEY = "Gsk_pLGi2K7zq3WfYTK6yMXaWGdyb3FY8Zs7OJsiVWZUZdv1pl5i0pAY"
-GROQ_MODEL = "openai/gpt-oss-120b"
+GROQ_MODEL = "llama-3.3-70b-versatile"
 PORT = int(os.environ.get("PORT", 8080))
 
 # Initialize Groq client
@@ -68,19 +68,10 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         # Call Groq API
         completion = groq_client.chat.completions.create(
             model=GROQ_MODEL,
-            messages=[
-                {
-                    "role": "system",
-                    "content": "You are a helpful AI assistant. Provide clear, concise, and helpful responses."
-                },
-                {
-                    "role": "user",
-                    "content": user_message
-                }
-            ],
+            messages=[{"role": "user", "content": user_message}],
             temperature=0.7,
             max_tokens=2048,
-            top_p=0.9,
+            top_p=1,
             stream=False
         )
         
