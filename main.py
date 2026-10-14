@@ -65,12 +65,14 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
     await update.message.chat.send_action(action="typing")
     
     try:
-        # Call Groq API adjusted for reasoning models
+        # Call Groq API with standard compatible parameters
         completion = groq_client.chat.completions.create(
             model=GROQ_MODEL,
             messages=[{"role": "user", "content": user_message}],
-            max_completion_tokens=2048,
-            reasoning_effort="medium"
+            max_tokens=2048,
+            temperature=0.7,
+            top_p=1,
+            stream=False
         )
         
         # Extract response
@@ -82,7 +84,7 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
     except Exception as e:
         logger.error(f"Error calling Groq API: {e}")
-        # عرض نص الخطأ بدقة على تيليجرام لكي يظهر السبب الفعلي إذا واجهنا أي رفض من الـ API
+        # عرض نص الخطأ بدقة على تيليجرام لتشخيصه إن وجد
         await update.message.reply_text(
             f"❌ Groq API Error:\n{str(e)}"
         )
@@ -101,7 +103,7 @@ async def init_telegram_bot():
     # Add handlers
     telegram_app.add_handler(CommandHandler("start", start))
     telegram_app.add_handler(CommandHandler("help", help_command))
-    telegram_app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
+    telegram_app.add_handler(MessageHandler(filters.TEXT & (~filters.COMMAND), handle_message))
     telegram_app.add_error_handler(error_handler)
     
     # Initialize and start the bot
