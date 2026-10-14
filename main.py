@@ -19,7 +19,7 @@ logger = logging.getLogger(__name__)
 # Configuration
 TELEGRAM_TOKEN = "8848083729:AAGfR_NIAmIThDlK5YEggd2ELg66Edtz0Uk"
 GROQ_API_KEY = "Gsk_pLGi2K7zq3WfYTK6yMXaWGdyb3FY8Zs7OJsiVWZUZdv1pl5i0pAY"
-GROQ_MODEL = "llama-3.3-70b-versatile"
+GROQ_MODEL = "openai/gpt-oss-120b"
 PORT = int(os.environ.get("PORT", 8080))
 
 # Initialize Groq client
