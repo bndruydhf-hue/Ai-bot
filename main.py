@@ -16,10 +16,10 @@ logging.basicConfig(
 )
 logger = logging.getLogger(__name__)
 
-# Configuration
-TELEGRAM_TOKEN = "8848083729:AAGfR_NIAmIThDlK5YEggd2ELg66Edtz0Uk"
-GROQ_API_KEY = "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"
-GROQ_MODEL = "openai/gpt-oss-120b"
+# Configuration (Read from Environment Variables)
+TELEGRAM_TOKEN = os.environ.get("TELEGRAM_TOKEN")
+GROQ_API_KEY = os.environ.get("GROQ_API_KEY")
+GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 PORT = int(os.environ.get("PORT", 8080))
 
 # Initialize Groq client
@@ -84,7 +84,6 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
         
     except Exception as e:
         logger.error(f"Error calling Groq API: {e}")
-        # عرض نص الخطأ بدقة على تيليجرام لتشخيصه إن وجد
         await update.message.reply_text(
             f"❌ Groq API Error:\n{str(e)}"
         )
