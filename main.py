@@ -317,7 +317,24 @@ async def process_ai_response(
     res_msg = response.choices[0].message
 
     if res_msg.tool_calls:
-      history.append(res_msg)
+      # تحويل رسالة المساعد إلى قاموس صحيح ومنظم لتفادي الخطأ تماماً
+      assistant_msg_dict = {
+          "role": "assistant",
+          "content": res_msg.content,
+          "tool_calls": [
+              {
+                  "id": call.id,
+                  "type": "function",
+                  "function": {
+                      "name": call.function.name,
+                      "arguments": call.function.arguments,
+                  },
+              }
+              for call in res_msg.tool_calls
+          ],
+      }
+      history.append(assistant_msg_dict)
+
       for call in res_msg.tool_calls:
         name, args = call.function.name, json.loads(call.function.arguments)
         res = ""
@@ -341,9 +358,12 @@ async def process_ai_response(
             "content": res,
         })
 
-      # تم ضبط tools=tools هنا لتمرير استجابة الأدوات بسلاسة تامة
       second_res = groq_client.chat.completions.create(
-          model=GROQ_MODEL, messages=history, tools=tools, max_tokens=2048
+          model=GROQ_MODEL,
+          messages=history,
+          tools=tools,
+          tool_choice="auto",
+          max_tokens=2048,
       )
       ai_response = second_res.choices[0].message.content
     else:
