@@ -13,6 +13,7 @@ from pathlib import Path
 
 import httpx
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
+from duckduckgo_search import DDGS
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from groq import AsyncGroq
@@ -181,64 +182,35 @@ TOOLS = [
 
 # ----------------------------- Tools -----------------------------------------
 async def search_web(query: str) -> str:
-    """Search Jina's search endpoint and return concise, source-linked results."""
+    """Search DuckDuckGo live and return concise results without any API key."""
     query = (query or "").strip()
     if not query:
         return "لم يتم توفير عبارة بحث."
 
-    url = "https://s.jina.ai/" + urllib.parse.quote(query, safe="")
-    headers = {
-        "Accept": "application/json",
-        "User-Agent": "Mozilla/5.0 StableAIAgent/1.0",
-    }
-
     try:
-        async with httpx.AsyncClient(
-            timeout=httpx.Timeout(20.0, connect=8.0),
-            follow_redirects=True,
-        ) as client:
-            response = await client.get(url, headers=headers)
-            response.raise_for_status()
-
-        # Jina's search endpoint commonly returns JSON, but handle text responses too.
-        try:
-            data = response.json()
-        except ValueError:
-            text_result = response.text.strip()
-            return text_result[:10000] if text_result else "لم تظهر نتائج بحث."
-
-        items = data.get("data", []) if isinstance(data, dict) else []
-        if not items and isinstance(data, list):
-            items = data
-
         results = []
-        for item in items[:6]:
-            if not isinstance(item, dict):
-                continue
-            title = str(item.get("title") or "نتيجة بحث").strip()
-            description = str(
-                item.get("description") or item.get("content") or item.get("snippet") or ""
-            ).strip()
-            link = str(item.get("url") or "").strip()
-            result = f"العنوان: {title}\nالمعلومات: {description[:1200]}"
-            if link:
-                result += f"\nالرابط: {link}"
+        def _search():
+            with DDGS() as ddgs:
+                return list(ddgs.text(query, max_results=5))
+
+        raw_results = await asyncio.to_thread(_search)
+        
+        for r in raw_results:
+            title = str(r.get("title", "")).strip()
+            body = str(r.get("body", "")).strip()
+            href = str(r.get("href", "")).strip()
+            
+            result = f"العنوان: {title}\nالمعلومات: {body}"
+            if href:
+                result += f"\nالرابط: {href}"
             results.append(result)
 
         if results:
             return "\n\n".join(results)[:10000]
-
-        # Some API responses place the useful content in other fields.
-        fallback = json.dumps(data, ensure_ascii=False)
-        return fallback[:8000] if fallback else "لم تظهر نتائج بحث."
-    except httpx.TimeoutException:
-        logger.warning("Web search timed out for query: %s", query)
-        return "انتهت مهلة البحث على الإنترنت. جرّب مرة أخرى."
-    except httpx.HTTPStatusError as exc:
-        logger.warning("Web search HTTP error: %s", exc.response.status_code)
-        return f"خدمة البحث أعادت خطأ HTTP {exc.response.status_code}."
+        return "لم تظهر نتائج بحث."
+        
     except Exception:
-        logger.exception("Web search failed")
+        logger.exception("DuckDuckGo search failed")
         return "تعذّر البحث على الإنترنت بسبب خطأ تقني."
 
 
@@ -248,7 +220,6 @@ def _youtube_transcript_sync(url: str) -> str:
         return "رابط يوتيوب غير صالح أو لم أستطع استخراج معرّف الفيديو."
     video_id = match.group(1)
     try:
-        # Support current and older youtube-transcript-api releases.
         api = YouTubeTranscriptApi()
         if hasattr(api, "fetch"):
             transcript = api.fetch(video_id, languages=["ar", "en"])
@@ -474,14 +445,11 @@ async def process_ai_response(
     chat_id = update.effective_chat.id
     await update.message.chat.send_action(action="typing")
 
-    # Load prior history, then add the current message exactly once.
     history = get_history(user_id, limit=10)
     history.append({"role": "user", "content": message_text})
     save_message(user_id, "user", message_text)
 
     try:
-        # Continue tool-calling cycles until the model returns a normal answer.
-        # The cap prevents accidental infinite loops.
         max_tool_rounds = 5
         ai_response = None
 
@@ -501,7 +469,6 @@ async def process_ai_response(
                 ai_response = (assistant_message.content or "").strip()
                 break
 
-            # Add the assistant tool-call message in the format expected by Groq.
             history.append({
                 "role": "assistant",
                 "content": assistant_message.content or "",
@@ -537,7 +504,6 @@ async def process_ai_response(
                 })
 
         if not ai_response:
-            # One final response-only request if the tool loop reached its cap.
             history.append({
                 "role": "system",
                 "content": "قدّم أفضل إجابة ممكنة الآن باستخدام نتائج الأدوات الموجودة. لا تستدعِ أدوات إضافية.",
@@ -555,13 +521,11 @@ async def process_ai_response(
             ai_response = "ما قدرت أجهّز ردًا هذه المرة. جرّب إعادة صياغة السؤال."
 
         save_message(user_id, "assistant", ai_response)
-        # Telegram message limit is 4096 characters; split long answers safely.
         for start_index in range(0, len(ai_response), 4000):
             await update.message.reply_text(ai_response[start_index:start_index + 4000])
 
     except Exception as exc:
         logger.exception("Error processing AI response")
-        # Keep detailed technical information in server logs, not in the user's chat.
         error_name = type(exc).__name__
         await update.message.reply_text(
             f"❌ تعذّر إكمال الرد بسبب خطأ تقني ({error_name}). "
@@ -645,7 +609,6 @@ async def init_telegram_bot() -> None:
         raise RuntimeError("TELEGRAM_TOKEN is missing.")
     telegram_app = Application.builder().token(TELEGRAM_TOKEN).build()
 
-    # Polling and webhooks cannot be active at the same time.
     try:
         await telegram_app.bot.delete_webhook(drop_pending_updates=False)
     except Exception:
