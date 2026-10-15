@@ -9,12 +9,10 @@ import sqlite3
 import tempfile
 import urllib.parse
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-import chromadb
 from duckduckgo_search import DDGS
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from groq import Groq
-from playwright.async_api import async_playwright
 from pypdf import PdfReader
 import requests
 from telegram import Update
@@ -42,12 +40,8 @@ GITHUB_TOKEN = os.environ.get("GITHUB_TOKEN")
 GROQ_MODEL = os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
 PORT = int(os.environ.get("PORT", 8080))
 
-# Initialize Groq & ChromaDB Vector Store
+# Initialize Groq client
 groq_client = Groq(api_key=GROQ_API_KEY)
-chroma_client = chromadb.PersistentClient(path="./chroma_db")
-knowledge_collection = chroma_client.get_or_create_collection(
-    name="personal_knowledge"
-)
 
 telegram_app: Application = None
 scheduler = AsyncIOScheduler()
@@ -72,10 +66,10 @@ def init_db():
 
 init_db()
 
-SYSTEM_PROMPT = """أنت مساعد ذكي ومتقدم ومنسق لفريق من الوكلاء المتخصصين (Multi-Agent System).
-- التاريخ الحالي هو: 15 أكتوبر 2026.
-- لديك أدوات متقدمة تشمل: RAG (قاعدة المعرفة)، Text-to-SQL (استعلام قواعد البيانات)، Playwright (المتصفح والأتمتة)، البحث العميق، يوتيوب، غيت هب، وتوليد الملفات.
-- نسق بين الوكلاء بدقة لتقديم أفضل إجابة تحليلية للمستخدم.
+SYSTEM_PROMPT = """أنت مساعد ذكي ومتقدم على تلجرام.
+- التاريخ الحالي هو: 15 أكتوبر 2026. التزم بهذا التاريخ تماماً.
+- لديك أدوات قوية: البحث في الويب، تلخيص يوتيوب، قراءة مستودعات GitHub، وتوليد الملفات وإرسالها للمستخدم.
+- ساعد المستخدم باحترافية وسرعة عالية.
 """
 
 
@@ -110,7 +104,6 @@ def save_message(user_id: int, role: str, content: str):
   conn.close()
 
 
-# --- TOOLS DEFINITION FOR GROQ FUNCTION CALLING ---
 tools = [
     {
         "type": "function",
@@ -132,69 +125,8 @@ tools = [
     {
         "type": "function",
         "function": {
-            "name": "query_personal_rag",
-            "description": (
-                "Search user's personal uploaded knowledge base (RAG)."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "query": {
-                        "type": "string",
-                        "description": "Search term in personal documents.",
-                    }
-                },
-                "required": ["query"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "execute_text_to_sql",
-            "description": (
-                "Execute a SQL query against the bot's SQLite database to"
-                " analyze messages or data."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "sql_query": {
-                        "type": "string",
-                        "description": (
-                            "SQL query (e.g., SELECT * FROM messages LIMIT 5)"
-                        ),
-                    }
-                },
-                "required": ["sql_query"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
-            "name": "browse_website_with_playwright",
-            "description": (
-                "Open a website using Playwright browser, extract text, or take"
-                " screenshot."
-            ),
-            "parameters": {
-                "type": "object",
-                "properties": {
-                    "url": {
-                        "type": "string",
-                        "description": "URL to browse.",
-                    }
-                },
-                "required": ["url"],
-            },
-        },
-    },
-    {
-        "type": "function",
-        "function": {
             "name": "summarize_youtube",
-            "description": "Summarize YouTube video transcript.",
+            "description": "Summarize YouTube video transcript using URL.",
             "parameters": {
                 "type": "object",
                 "properties": {
@@ -244,7 +176,6 @@ tools = [
 ]
 
 
-# --- TOOL IMPLEMENTATIONS ---
 def search_web(query: str) -> str:
   try:
     with DDGS() as ddgs:
@@ -259,45 +190,6 @@ def search_web(query: str) -> str:
       return "لا توجد نتائج."
   except Exception as e:
     return f"خطأ: {e}"
-
-
-def query_personal_rag(query: str) -> str:
-  try:
-    results = knowledge_collection.query(query_texts=[query], n_results=3)
-    docs = results.get("documents", [[]])[0]
-    if docs:
-      return "مستندات ذات صلة من قاعدة المعرفة:\n" + "\n".join(docs)
-    return "لا توجد معلومات مطابقة في قاعدة المعرفة الشخصية."
-  except Exception as e:
-    return f"خطأ RAG: {e}"
-
-
-def execute_text_to_sql(sql_query: str) -> str:
-  try:
-    # حماية بسيطة للاستعلامات
-    if not sql_query.strip().lower().startswith("select"):
-      return "مسموح فقط باستعلامات القراءة (SELECT)."
-    conn = sqlite3.connect(DB_NAME)
-    cursor = conn.cursor()
-    cursor.execute(sql_query)
-    rows = cursor.fetchall()
-    conn.close()
-    return f"نتائج قاعدة البيانات:\n{json.dumps(rows, ensure_ascii=False)}"
-  except Exception as e:
-    return f"خطأ في تنفيذ SQL: {e}"
-
-
-async def browse_website_with_playwright(url: str) -> str:
-  try:
-    async with async_playwright() as p:
-      browser = await p.chromium.launch(headless=True)
-      page = await browser.new_page()
-      await page.goto(url, timeout=30000)
-      content = await page.inner_text("body")
-      await browser.close()
-      return content[:10000]
-  except Exception as e:
-    return f"خطأ Playwright: {e}"
 
 
 def summarize_youtube(url: str) -> str:
@@ -358,19 +250,16 @@ async def generate_and_send_file_tool(
     return f"خطأ ملف: {e}"
 
 
-# --- HANDLERS ---
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "🤖 أهلاً بك! تم ترقية البوت بنجاح ليعمل بنظام **Multi-Agent** متكامل مع"
-      " RAG, Text-to-SQL, و Playwright Browser!"
+      "🤖 أهلاً بك! البوت جاهز ويعمل بكفاءة عالية على السحاب."
   )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "📚 ميزات النظام:\n- RAG (قاعدة المعرفة للملفات المرفوعة)\n- SQL Agent"
-      " (تحليل قاعدة البيانات)\n- Playwright (تصفح المواقع الحية)\n- يوتيوب وغيت"
-      " هب وتوليد الملفات"
+      "📚 الأوامر المتاحة:\n- الدردشة والبحث\n- يوتيوب\n- `/draw [الوصف]`\n- `/remind"
+      " [ثواني] [النص]`"
   )
 
 
@@ -434,12 +323,6 @@ async def process_ai_response(
         res = ""
         if name == "search_web":
           res = search_web(args.get("query"))
-        elif name == "query_personal_rag":
-          res = query_personal_rag(args.get("query"))
-        elif name == "execute_text_to_sql":
-          res = execute_text_to_sql(args.get("sql_query"))
-        elif name == "browse_website_with_playwright":
-          res = await browse_website_with_playwright(args.get("url"))
         elif name == "summarize_youtube":
           res = summarize_youtube(args.get("url"))
         elif name == "github_repo_action":
@@ -485,14 +368,8 @@ async def handle_document(
         if file_name.endswith(".pdf")
         else file_bytes.decode("utf-8", errors="ignore")
     )
-
-    # حفظ الملف في قاعدة المعرفة (RAG)
-    knowledge_collection.add(
-        documents=[text[:5000]],
-        ids=[f"{user_id}_{datetime.now().timestamp()}"],
-    )
-    await update.message.reply_text(
-        f"📂 تم حفظ الملف `{file_name}` في قاعدة المعرفة (RAG) بنجاح!"
+    await process_ai_response(
+        update, user_id, f"ملف مرفق ({file_name}):\n{text[:10000]}"
     )
   except Exception as e:
     await update.message.reply_text(f"❌ خطأ ملف: {e}")
@@ -550,12 +427,12 @@ async def lifespan(app: FastAPI):
     await telegram_app.shutdown()
 
 
-app = FastAPI(title="Enterprise Multi-Agent Telegram Bot", lifespan=lifespan)
+app = FastAPI(title="Stable AI Agent", lifespan=lifespan)
 
 
 @app.get("/")
 async def health_check():
-  return JSONResponse({"status": "healthy", "service": "Enterprise AI Agent"})
+  return JSONResponse({"status": "healthy", "service": "Stable AI Agent"})
 
 
 def main():
