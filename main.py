@@ -12,6 +12,7 @@ from apscheduler.schedulers.asyncio import AsyncIOScheduler
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from groq import Groq
+import httpx
 from pypdf import PdfReader
 import requests
 from telegram import Update
@@ -175,28 +176,29 @@ tools = [
 ]
 
 
-def search_web(query: str) -> str:
+async def search_web(query: str) -> str:
   try:
     url = f"https://s.jina.ai/{urllib.parse.quote(query)}"
     headers = {"Accept": "application/json"}
-    response = requests.get(url, headers=headers, timeout=12)
-    if response.status_code == 200:
-      try:
-        data = response.json()
-        results = data.get("data", [])
-        if results:
-          snippets = []
-          for item in results[:3]:
-            title = item.get("title", "")
-            content = item.get("description", "") or item.get("content", "")
-            link = item.get("url", "")
-            snippets.append(
-                f"- **{title}**: {content[:300]} (المصدر: {link})"
-            )
-          return "\n".join(snippets)
-      except Exception:
-        pass
-      return response.text[:4000]
+    async with httpx.AsyncClient(timeout=10.0) as client:
+      response = await client.get(url, headers=headers)
+      if response.status_code == 200:
+        try:
+          data = response.json()
+          results = data.get("data", [])
+          if results:
+            snippets = []
+            for item in results[:3]:
+              title = item.get("title", "")
+              content = item.get("description", "") or item.get("content", "")
+              link = item.get("url", "")
+              snippets.append(
+                  f"- **{title}**: {content[:300]} (المصدر: {link})"
+              )
+            return "\n".join(snippets)
+        except Exception:
+          pass
+        return response.text[:4000]
     return "لا توجد نتائج بحث مطابقة."
   except Exception as e:
     return f"خطأ في البحث: {e}"
@@ -262,7 +264,7 @@ async def generate_and_send_file_tool(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "🤖 أهلاً بك! تم تحديث البوت بمحرك بحث سريع وموثوق."
+      "🤖 أهلاً بك! تم إصلاح مشكلة البحث وأصبح البوت يعمل بسلاسة تامة."
   )
 
 
@@ -348,7 +350,7 @@ async def process_ai_response(
         name, args = call.function.name, json.loads(call.function.arguments)
         res = ""
         if name == "search_web":
-          res = search_web(args.get("query"))
+          res = await search_web(args.get("query"))
         elif name == "summarize_youtube":
           res = summarize_youtube(args.get("url"))
         elif name == "github_repo_action":
