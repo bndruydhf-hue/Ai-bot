@@ -67,8 +67,8 @@ init_db()
 
 SYSTEM_PROMPT = """أنت مساعد ذكي ومتقدم على تلجرام.
 - التاريخ الحالي هو: 15 أكتوبر 2026. التزم بهذا التاريخ تماماً.
-- لديك أدوات بحث متقدمة عبر الإنترنت تجلب معلومات حقيقية ودقيقة بنسبة 100%.
-- إذا سألك المستخدم عن أسعار أو أجهزة حديثة، استخدم أداة البحث لجلب الواقع الفعلي ولا تخمن من نفسك أبداً.
+- لديك أداة بحث حية ومباشرة عبر الإنترنت تجلب معلومات دقيقة وواقعية.
+- عند البحث عن أسعار أو أجهزة، اعتمد على نتائج البحث الحقيقية ولا تخمن أبداً.
 """
 
 
@@ -179,24 +179,24 @@ def search_web(query: str) -> str:
   try:
     url = f"https://s.jina.ai/{urllib.parse.quote(query)}"
     headers = {"Accept": "application/json"}
-    response = requests.get(url, headers=headers, timeout=15)
+    response = requests.get(url, headers=headers, timeout=12)
     if response.status_code == 200:
       try:
         data = response.json()
         results = data.get("data", [])
         if results:
           snippets = []
-          for item in results[:4]:
+          for item in results[:3]:
             title = item.get("title", "")
             content = item.get("description", "") or item.get("content", "")
             link = item.get("url", "")
             snippets.append(
-                f"- **{title}**: {content[:400]} (المصدر: {link})"
+                f"- **{title}**: {content[:300]} (المصدر: {link})"
             )
           return "\n".join(snippets)
       except Exception:
         pass
-      return response.text[:8000]
+      return response.text[:4000]
     return "لا توجد نتائج بحث مطابقة."
   except Exception as e:
     return f"خطأ في البحث: {e}"
@@ -262,7 +262,7 @@ async def generate_and_send_file_tool(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "🤖 أهلاً بك! تم تحديث محرك البحث السحابي وأصبح جاهزاً للعمل بدقة عالية."
+      "🤖 أهلاً بك! تم تحديث البوت بمحرك بحث سريع وموثوق."
   )
 
 
@@ -329,7 +329,7 @@ async def process_ai_response(
     if res_msg.tool_calls:
       assistant_msg_dict = {
           "role": "assistant",
-          "content": res_msg.content,
+          "content": res_msg.content or "",
           "tool_calls": [
               {
                   "id": call.id,
@@ -364,7 +364,7 @@ async def process_ai_response(
             "tool_call_id": call.id,
             "role": "tool",
             "name": name,
-            "content": res,
+            "content": str(res),
         })
 
       second_res = groq_client.chat.completions.create(
@@ -382,7 +382,8 @@ async def process_ai_response(
     if ai_response:
       await update.message.reply_text(ai_response)
   except Exception as e:
-    await update.message.reply_text(f"❌ خطأ: {e}")
+    logger.error(f"Error processing response: {e}")
+    await update.message.reply_text(f"❌ حدث خطأ أثناء المعالجة: {e}")
 
 
 async def handle_document(
