@@ -9,7 +9,6 @@ import sqlite3
 import tempfile
 import urllib.parse
 from apscheduler.schedulers.asyncio import AsyncIOScheduler
-from duckduckgo_search import DDGS
 from fastapi import FastAPI
 from fastapi.responses import JSONResponse
 from groq import Groq
@@ -68,8 +67,8 @@ init_db()
 
 SYSTEM_PROMPT = """أنت مساعد ذكي ومتقدم على تلجرام.
 - التاريخ الحالي هو: 15 أكتوبر 2026. التزم بهذا التاريخ تماماً.
-- لديك أدوات قوية: البحث في الويب، تلخيص يوتيوب، قراءة مستودعات GitHub، وتوليد الملفات وإرسالها للمستخدم.
-- ساعد المستخدم باحترافية وسرعة عالية.
+- لديك أدوات بحث متقدمة عبر الإنترنت تجلب معلومات حقيقية ودقيقة بنسبة 100%.
+- إذا سألك المستخدم عن أسعار أو أجهزة حديثة، استخدم أداة البحث لجلب الواقع الفعلي ولا تخمن من نفسك أبداً.
 """
 
 
@@ -178,18 +177,29 @@ tools = [
 
 def search_web(query: str) -> str:
   try:
-    with DDGS() as ddgs:
-      results = [r for r in ddgs.text(query, max_results=3)]
-      if results:
-        return "\n".join(
-            [
-                f"- {r.get('title')}: {r.get('body')} ({r.get('href')})"
-                for r in results
-            ]
-        )
-      return "لا توجد نتائج."
+    url = f"https://s.jina.ai/{urllib.parse.quote(query)}"
+    headers = {"Accept": "application/json"}
+    response = requests.get(url, headers=headers, timeout=15)
+    if response.status_code == 200:
+      try:
+        data = response.json()
+        results = data.get("data", [])
+        if results:
+          snippets = []
+          for item in results[:4]:
+            title = item.get("title", "")
+            content = item.get("description", "") or item.get("content", "")
+            link = item.get("url", "")
+            snippets.append(
+                f"- **{title}**: {content[:400]} (المصدر: {link})"
+            )
+          return "\n".join(snippets)
+      except Exception:
+        pass
+      return response.text[:8000]
+    return "لا توجد نتائج بحث مطابقة."
   except Exception as e:
-    return f"خطأ: {e}"
+    return f"خطأ في البحث: {e}"
 
 
 def summarize_youtube(url: str) -> str:
@@ -252,14 +262,14 @@ async def generate_and_send_file_tool(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "🤖 أهلاً بك! البوت جاهز ويعمل بكفاءة عالية على السحاب."
+      "🤖 أهلاً بك! تم تحديث محرك البحث السحابي وأصبح جاهزاً للعمل بدقة عالية."
   )
 
 
 async def help_command(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "📚 الأوامر المتاحة:\n- الدردشة والبحث\n- يوتيوب\n- `/draw [الوصف]`\n- `/remind"
-      " [ثواني] [النص]`"
+      "📚 الأوامر المتاحة:\n- البحث المباشر في الويب\n- تلخيص يوتيوب\n- `/draw"
+      " [الوصف]`\n- `/remind [ثواني] [النص]`"
   )
 
 
@@ -317,7 +327,6 @@ async def process_ai_response(
     res_msg = response.choices[0].message
 
     if res_msg.tool_calls:
-      # تحويل رسالة المساعد إلى قاموس صحيح ومنظم لتفادي الخطأ تماماً
       assistant_msg_dict = {
           "role": "assistant",
           "content": res_msg.content,
