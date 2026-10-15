@@ -264,7 +264,7 @@ async def generate_and_send_file_tool(
 
 async def start(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
   await update.message.reply_text(
-      "🤖 أهلاً بك! تم إصلاح مشكلة البحث وأصبح البوت يعمل بسلاسة تامة."
+      "🤖 أهلاً بك! تم إعداد البوت والاتصال بنجاح."
   )
 
 
@@ -432,6 +432,13 @@ async def handle_message(update: Update, context: ContextTypes.DEFAULT_TYPE) -> 
 async def init_telegram_bot():
   global telegram_app
   telegram_app = Application.builder().token(TELEGRAM_TOKEN).build()
+
+  # حذف أي ربط Webhook قديم لتفعيل الاستقبال الفوري عبر Polling
+  try:
+    await telegram_app.bot.delete_webhook(drop_pending_updates=True)
+  except Exception as e:
+    logger.error(f"Error deleting webhook: {e}")
+
   telegram_app.add_handler(CommandHandler("start", start))
   telegram_app.add_handler(CommandHandler("help", help_command))
   telegram_app.add_handler(CommandHandler("draw", draw_command))
