@@ -341,8 +341,9 @@ async def process_ai_response(
             "content": res,
         })
 
+      # تم ضبط tools=tools هنا لتمرير استجابة الأدوات بسلاسة تامة
       second_res = groq_client.chat.completions.create(
-          model=GROQ_MODEL, messages=history, max_tokens=2048
+          model=GROQ_MODEL, messages=history, tools=tools, max_tokens=2048
       )
       ai_response = second_res.choices[0].message.content
     else:
