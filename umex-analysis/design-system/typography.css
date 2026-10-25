@@ -1,0 +1,135 @@
+/**
+ * UMEX Design System - Typography Scale
+ * Extracted from production CSS
+ */
+
+:root {
+  /* ============================================
+     FONT FAMILIES
+     ============================================ */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: 'JetBrains Mono', 'Fira Code', 'SF Mono', Monaco, Consolas, monospace;
+  --font-family-display: var(--font-family-sans);
+
+  /* ============================================
+     FONT WEIGHTS
+     ============================================ */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  /* ============================================
+     FONT SIZES (Mobile first)
+     ============================================ */
+  --font-size-xs: 0.75rem;    /* 12px */
+  --font-size-sm: 0.875rem;   /* 14px */
+  --font-size-md: 1rem;       /* 16px */
+  --font-size-lg: 1.125rem;   /* 18px */
+  --font-size-xl: 1.25rem;    /* 20px */
+  --font-size-2xl: 1.5rem;    /* 24px */
+  --font-size-3xl: 1.875rem;  /* 30px */
+  --font-size-4xl: 2.25rem;   /* 36px */
+  --font-size-5xl: 3rem;      /* 48px */
+
+  /* ============================================
+     LINE HEIGHTS
+     ============================================ */
+  --line-height-tight: 1.1;
+  --line-height-snug: 1.375;
+  --line-height-normal: 1.5;
+  --line-height-relaxed: 1.625;
+  --line-height-loose: 2;
+
+  /* ============================================
+     TYPOGRAPHY SCALE (Responsive)
+     ============================================ */
+
+  /* Display / Hero */
+  --text-display: var(--font-size-4xl);
+  --text-display-line: var(--line-height-tight);
+  --text-display-weight: var(--font-weight-bold);
+
+  /* Headings */
+  --text-h1: var(--font-size-3xl);
+  --text-h1-line: var(--line-height-tight);
+  --text-h1-weight: var(--font-weight-bold);
+
+  --text-h2: var(--font-size-2xl);
+  --text-h2-line: var(--line-height-snug);
+  --text-h2-weight: var(--font-weight-bold);
+
+  --text-h3: var(--font-size-xl);
+  --text-h3-line: var(--line-height-snug);
+  --text-h3-weight: var(--font-weight-semibold);
+
+  --text-h4: var(--font-size-lg);
+  --text-h4-line: var(--line-height-normal);
+  --text-h4-weight: var(--font-weight-semibold);
+
+  /* Body Text */
+  --text-body-lg: var(--font-size-lg);
+  --text-body-lg-line: var(--line-height-relaxed);
+  --text-body-lg-weight: var(--font-weight-normal);
+
+  --text-body: var(--font-size-md);
+  --text-body-line: var(--line-height-normal);
+  --text-body-weight: var(--font-weight-normal);
+
+  --text-body-sm: var(--font-size-sm);
+  --text-body-sm-line: var(--line-height-normal);
+  --text-body-sm-weight: var(--font-weight-normal);
+
+  --text-body-xs: var(--font-size-xs);
+  --text-body-xs-line: var(--line-height-normal);
+  --text-body-xs-weight: var(--font-weight-normal);
+
+  /* UI Text */
+  --text-label: var(--font-size-sm);
+  --text-label-line: var(--line-height-normal);
+  --text-label-weight: var(--font-weight-medium);
+
+  --text-caption: var(--font-size-xs);
+  --text-caption-line: var(--line-height-normal);
+  --text-caption-weight: var(--font-weight-normal);
+
+  --text-button: var(--font-size-sm);
+  --text-button-line: var(--line-height-normal);
+  --text-button-weight: var(--font-weight-semibold);
+
+  /* Monospace / Data */
+  --text-mono: var(--font-size-sm);
+  --text-mono-line: var(--line-height-normal);
+  --text-mono-family: var(--font-family-mono);
+
+  --text-mono-lg: var(--font-size-md);
+  --text-mono-lg-line: var(--line-height-normal);
+  --text-mono-lg-family: var(--font-family-mono);
+
+  --text-price: var(--font-size-xl);
+  --text-price-line: var(--line-height-tight);
+  --text-price-weight: var(--font-weight-bold);
+  --text-price-family: var(--font-family-mono);
+
+  --text-price-lg: var(--font-size-2xl);
+  --text-price-lg-line: var(--line-height-tight);
+  --text-price-lg-weight: var(--font-weight-bold);
+  --text-price-lg-family: var(--font-family-mono);
+}
+
+/* ============================================
+   RESPONSIVE TYPOGRAPHY (Desktop)
+   ============================================ */
+@media (min-width: 768px) {
+  :root {
+    --text-display: var(--font-size-5xl);
+    --text-h1: var(--font-size-4xl);
+    --text-h2: var(--font-size-3xl);
+    --text-h3: var(--font-size-2xl);
+    --text-h4: var(--font-size-xl);
+    --text-body-lg: var(--font-size-xl);
+    --text-body: var(--font-size-lg);
+    --text-price: var(--font-size-2xl);
+    --text-price-lg: var(--font-size-3xl);
+  }
+}

@@ -1,0 +1,67 @@
+/**
+ * UMEX Design System - Spacing Scale
+ * Based on 4px base unit
+ */
+
+:root {
+  /* ============================================
+     BASE SPACING UNIT: 4px
+     ============================================ */
+  --space-0: 0;
+  --space-1: 4px;    /* 0.25rem */
+  --space-2: 8px;    /* 0.5rem */
+  --space-3: 12px;   /* 0.75rem */
+  --space-4: 16px;   /* 1rem */
+  --space-5: 20px;   /* 1.25rem */
+  --space-6: 24px;   /* 1.5rem */
+  --space-8: 32px;   /* 2rem */
+  --space-10: 40px;  /* 2.5rem */
+  --space-12: 48px;  /* 3rem */
+  --space-16: 64px;  /* 4rem */
+  --space-20: 80px;  /* 5rem */
+  --space-24: 96px;  /* 6rem */
+
+  /* ============================================
+     COMPONENT-SPECIFIC SPACING
+     ============================================ */
+  --space-button-padding-x: var(--space-4);
+  --space-button-padding-y: var(--space-2);
+  --space-button-padding-x-lg: var(--space-6);
+  --space-button-padding-y-lg: var(--space-3);
+  --space-input-padding-x: var(--space-3);
+  --space-input-padding-y: var(--space-2);
+  --space-card-padding: var(--space-4);
+  --space-card-padding-lg: var(--space-6);
+  --space-modal-padding: var(--space-6);
+  --space-page-padding: var(--space-4);
+  --space-page-padding-lg: var(--space-6);
+  --space-section-gap: var(--space-8);
+  --space-component-gap: var(--space-4);
+  --space-element-gap: var(--space-2);
+  --space-icon-gap: var(--space-2);
+
+  /* ============================================
+     LAYOUT SPACING
+     ============================================ */
+  --space-header-height: 56px;
+  --space-header-height-mobile: 48px;
+  --space-tabbar-height: 72px;
+  --space-toolbar-width: 280px;
+  --space-sidebar-width: 260px;
+  --space-sidebar-collapsed: 64px;
+  --space-container-max: 1440px;
+  --space-container-padding: var(--space-4);
+
+  /* ============================================
+     Z-INDEX SCALE
+     ============================================ */
+  --z-index-dropdown: 100;
+  --z-index-sticky: 200;
+  --z-index-fixed: 300;
+  --z-index-modal-backdrop: 400;
+  --z-index-modal: 500;
+  --z-index-popover: 600;
+  --z-index-tooltip: 700;
+  --z-index-toast: 800;
+  --z-index-loading: 900;
+}

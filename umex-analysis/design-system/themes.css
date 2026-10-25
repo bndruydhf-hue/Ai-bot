@@ -1,0 +1,100 @@
+/**
+ * UMEX Design System - Theme Definitions
+ */
+
+:root {
+  /* ============================================
+     DARK THEME (Default)
+     ============================================ */
+  --color-scheme: dark;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --color-scheme: dark;
+  }
+}
+
+/* ============================================
+   LIGHT THEME
+   ============================================ */
+@media (prefers-color-scheme: light) {
+  :root {
+    --color-scheme: light;
+    --color-theme-background: #f8f9fa;
+    --color-theme-surface: #ffffff;
+    --color-theme-border: #e2e8f0;
+    --color-text-primary: #1e293b;
+    --color-text-secondary-l1: #475569;
+    --color-text-secondary-l2: #64748b;
+    --color-text-secondary-l3: #94a3b8;
+    --color-surface-l1: #f1f5f9;
+    --color-surface-l1-hover: #e2e8f0;
+    --color-surface-l1-press: #cbd5e1;
+    --color-surface-l1-on: #1e293b;
+    --color-surface-l2: #ffffff;
+    --color-surface-l2-hover: #f8fafc;
+    --color-surface-l2-press: #f1f5f9;
+    --color-surface-l2-on: #1e293b;
+    --color-app-border-secondary: #e2e8f0;
+    --color-app-border-secondary-hover: #cbd5e1;
+    --color-app-border-secondary-press: #e2e8f0;
+    --glass-panel-stroke: #e2e8f0;
+    --glass-surface-l1: rgba(241, 245, 249, 0.9);
+    --glass-screen-base: #f8f9fa;
+  }
+}
+
+/* ============================================
+   THEME CLASS OVERRIDES (for manual switching)
+   ============================================ */
+[data-theme="dark"] {
+  --color-scheme: dark;
+}
+
+[data-theme="light"] {
+  --color-scheme: light;
+  --color-theme-background: #f8f9fa;
+  --color-theme-surface: #ffffff;
+  --color-theme-border: #e2e8f0;
+  --color-text-primary: #1e293b;
+  --color-text-secondary-l1: #475569;
+  --color-text-secondary-l2: #64748b;
+  --color-text-secondary-l3: #94a3b8;
+  --color-surface-l1: #f1f5f9;
+  --color-surface-l1-hover: #e2e8f0;
+  --color-surface-l1-press: #cbd5e1;
+  --color-surface-l1-on: #1e293b;
+  --color-surface-l2: #ffffff;
+  --color-surface-l2-hover: #f8fafc;
+  --color-surface-l2-press: #f1f5f9;
+  --color-surface-l2-on: #1e293b;
+  --color-app-border-secondary: #e2e8f0;
+  --color-app-border-secondary-hover: #cbd5e1;
+  --color-app-border-secondary-press: #e2e8f0;
+  --glass-panel-stroke: #e2e8f0;
+  --glass-surface-l1: rgba(241, 245, 249, 0.9);
+  --glass-screen-base: #f8f9fa;
+}
+
+/* Graphite theme variant */
+[data-theme="graphite"] {
+  --color-theme-background: #0d1117;
+  --glass-screen-base: #0d1117;
+}
+
+/* ============================================
+   PRINT STYLES
+   ============================================ */
+@media print {
+  :root {
+    --color-theme-background: #ffffff;
+    --color-theme-surface: #ffffff;
+    --color-text-primary: #000000;
+    --color-text-secondary-l1: #333333;
+    --color-text-secondary-l2: #666666;
+    --color-surface-l1: #f5f5f5;
+    --color-surface-l2: #ffffff;
+    --glass-panel-stroke: #cccccc;
+  }
+}

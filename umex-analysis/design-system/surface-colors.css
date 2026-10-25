@@ -1,0 +1,80 @@
+/**
+ * UMEX Design System - Surface Hierarchy
+ * 4-level elevation system extracted from production
+ */
+
+:root {
+  /* ============================================
+     SURFACE HIERARCHY (4 Levels)
+     ============================================ */
+
+  /* Level 1 - Deepest/Background */
+  --color-surface-l1: #16212e;
+  --color-surface-l1-a20: #16212e33;
+  --color-surface-l1-hover: #121b26;
+  --color-surface-l1-press: #0e161f;
+  --color-surface-l1-on: #eaecf1;
+  --color-surface-l1-on-l2: #adb5c8;
+  --color-surface-l1-on-l3: #707e9f;
+
+  /* Level 2 - Cards/Panels */
+  --color-surface-l2: #1f2a37;
+  --color-surface-l2-a00: #1f2a3700;
+  --color-surface-l2-hover: #293644;
+  --color-surface-l2-press: #19242f;
+  --color-surface-l2-on: #eaecf1;
+  --color-surface-l2-on-l2: #adb5c8;
+
+  /* Level 3 - Elevated/Modals */
+  --color-surface-l3: #2a3846;
+  --color-surface-l3-hover: #33424f;
+  --color-surface-l3-press: #253240;
+  --color-surface-l3-on: #eaecf1;
+  --color-surface-l3-on-l2: #adb5c8;
+  --color-surface-l3-on-l3: #707e9f;
+
+  /* Level 4 - Highest/Tooltips */
+  --color-surface-l4: #354553;
+  --color-surface-l4-hover: #3e4f5e;
+  --color-surface-l4-press: #2f3e4b;
+  --color-surface-l4-on: #eaecf1;
+  --color-surface-l4-on-l2: #adb5c8;
+  --color-surface-l4-on-l3: #707e9f;
+  --color-surface-l4-on-l4: #485a84;
+  --color-surface-l4-on-l4-hover: #52638b;
+  --color-surface-l4-on-l4-press: #43547c;
+
+  /* ============================================
+     TRADEROOM SPECIFIC SURFACES
+     ============================================ */
+  --color-traderoom-surface-primary: #35a7ff;
+  --color-traderoom-surface-primary-a80: #35a7ffcc;
+  --color-traderoom-surface-primary-a00: #35a7ff00;
+  --color-traderoom-surface-secondary-l1: #181e2c;
+  --color-traderoom-surface-secondary-l1-a70: #181e2cb2;
+  --color-traderoom-surface-secondary-l1-a70-hover: #1d2537b2;
+  --color-traderoom-surface-secondary-l1-a70-press: #10141db2;
+  --color-traderoom-surface-secondary-l2: #2a344d;
+  --color-traderoom-surface-secondary-l2-a85: #2a344dd9;
+  --color-traderoom-border-primary: #35a7ff;
+  --color-traderoom-border-secondary: #485a84;
+  --color-traderoom-border-secondary-on: #485a84;
+
+  /* ============================================
+     APP SPECIFIC SURFACES
+     ============================================ */
+  --color-app-surface-primary-l1: #0a84ff;
+  --color-app-surface-primary-l1-a10: #0a84ff1a;
+  --color-app-surface-primary-l1-a00: #0a84ff00;
+  --color-app-surface-primary-l1-hover: #2e95ff;
+  --color-app-surface-primary-l1-press: #0973dd;
+  --color-app-surface-primary-l3: #8eceff;
+  --color-app-border-primary: #35a7ff;
+  --color-app-border-primary-hover: #4bb0ff;
+  --color-app-border-primary-press: #2f94e2;
+  --color-app-border-primary-on: #61baff;
+  --color-app-border-secondary: #ffffff1f;
+  --color-app-border-secondary-hover: #ffffff30;
+  --color-app-border-secondary-press: #ffffff29;
+  --color-app-border-secondary-on: #ffffff1f;
+}

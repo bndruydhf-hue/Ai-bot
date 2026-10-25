@@ -1,0 +1,73 @@
+/**
+ * UMEX Design System - Color Tokens
+ * Extracted from production: https://app.umex.com/trade/SPARK
+ * Source: assets/index-D4kpDWzq.css
+ */
+
+:root {
+  /* ============================================
+     BRAND COLORS
+     ============================================ */
+  --color-brand-primary: #35a7ff;
+  --color-brand-primary-hover: #5cb6ff;
+  --color-brand-primary-press: #2395ea;
+  --color-brand-primary-on: #ffffff;
+
+  /* ============================================
+     THEME BACKGROUNDS
+     ============================================ */
+  --color-theme-background: #080b16;
+  --color-theme-surface: #0a0e1a;
+  --color-theme-border: #1e293b;
+
+  /* ============================================
+     TEXT COLORS
+     ============================================ */
+  --color-text-primary: #eaecf1;
+  --color-text-primary-hover: #f8f8fa;
+  --color-text-primary-press: #d6dae3;
+  --color-text-secondary-l1: #adb5c8;
+  --color-text-secondary-l2: #707e9f;
+  --color-text-secondary-l3: #485a84;
+  --color-text-inverse: #000000;
+  --color-text-white: #ffffff;
+  --color-text-white-a60: #ffffff99;
+  --color-text-white-a50: #ffffff80;
+  --color-text-white-a40: #ffffff66;
+
+  /* ============================================
+     SEMANTIC COLORS
+     ============================================ */
+  --color-success: #13bf7d;
+  --color-success-surface: #0e8f5e;
+  --color-success-on: #ffffff;
+
+  --color-warning: #f7a741;
+  --color-warning-surface: #be6e08;
+  --color-warning-on: #ffffff;
+
+  --color-error: #ff595c;
+  --color-error-surface: #c64547;
+  --color-error-on: #ffffff;
+
+  --color-info: #35a7ff;
+  --color-info-surface: #2395ea;
+  --color-info-on: #ffffff;
+
+  /* ============================================
+     TRADING COLORS (Candlesticks, P&L)
+     ============================================ */
+  --color-trading-up: #0e8f5e;
+  --color-trading-up-bg: #0e8f5e4d;
+  --color-trading-up-border: #0e8f5ecc;
+  --color-trading-up-on: #ffffff;
+
+  --color-trading-down: #c64547;
+  --color-trading-down-bg: #c645474d;
+  --color-trading-down-border: #c64547cc;
+  --color-trading-down-on: #ffffff;
+
+  --color-trading-gate: #f7a741;
+  --color-trading-gate-bg: #f7a7414d;
+  --color-trading-point: #ffffff;
+}

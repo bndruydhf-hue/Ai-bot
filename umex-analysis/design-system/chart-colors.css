@@ -1,0 +1,32 @@
+/**
+ * UMEX Design System - Chart & Trading Colors
+ * Extracted from production: https://app.umex.com/trade/SPARK
+ */
+
+:root {
+  /* ============================================
+     CHART COLORS
+     ============================================ */
+  --color-chart-grid: #2a344d;
+  --color-chart-crosshair: #8557e2;
+  --color-chart-text: #52638b;
+  --color-chart-area-primary: #35a7ff;
+  --color-chart-area-primary-a00: #35a7ff00;
+  --color-chart-surface-primary: #35a7ff;
+  --color-chart-surface-primary-a30: #35a7ff4d;
+  --color-chart-surface-primary-a80: #35a7ffcc;
+  --color-chart-surface-secondary-l1: #10141d;
+  --color-chart-surface-secondary-l2: #1d2537;
+
+  /* ============================================
+     INDICATOR COLORS (VR01-VR08)
+     ============================================ */
+  --color-indicator-vr01: #ffffff;
+  --color-indicator-vr02: #f7a741;
+  --color-indicator-vr03: #be6e08;
+  --color-indicator-vr04: #ff7d80;
+  --color-indicator-vr05: #8d3133;
+  --color-indicator-vr06: #1d5c8d;
+  --color-indicator-vr07: #9662ff;
+  --color-indicator-vr08: #49dfa6;
+}
