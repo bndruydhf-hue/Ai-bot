@@ -1,0 +1,50 @@
+{
+  "browser": {
+    "mode": "launch",
+    "executable_path": "/home/node/.cache/ms-playwright/chromium-1248/chrome-linux64/chrome",
+    "headless": true
+  },
+  "start_url": {
+    "url": "https://app.umex.com/trade/SPARK"
+  },
+  "actions": [
+    {
+      "step_id": "navigate",
+      "action": "goto",
+      "destination": {
+        "url": "https://app.umex.com/trade/SPARK"
+      },
+      "wait_until": "domcontentloaded"
+    },
+    {
+      "step_id": "wait_load",
+      "action": "wait_for_timeout",
+      "duration_ms": 10000
+    }
+  ],
+  "storage": {
+    "cookies": [],
+    "local_storage": [],
+    "session_storage": []
+  },
+  "capture": {
+    "after_each_step": ["screenshot", "dom", "url"],
+    "at_end": ["screenshot", "dom", "url", "accessibility"],
+    "events": [],
+    "network": {
+      "request_body": false,
+      "response_body": false,
+      "header_values": false
+    },
+    "limits": {
+      "max_events": 10000,
+      "max_event_allocation_bytes": 4194304,
+      "max_total_event_allocation_bytes": 16777216,
+      "max_network_transactions": 1024,
+      "max_network_body_bytes": 65536,
+      "max_network_body_allocation_bytes": 1048576,
+      "max_network_header_allocation_bytes": 1048576,
+      "max_network_metadata_allocation_bytes": 1048576
+    }
+  }
+}
